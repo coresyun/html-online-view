@@ -886,11 +886,14 @@
     function updateCount(){
       countEl.textContent = matches.length ? (current+1)+'/'+matches.length : (findInput.value ? '0/0' : '');
     }
-    function select(i){
+    function select(i, forceFocus){
       if(!matches.length) return;
       current = (i + matches.length) % matches.length;
       const m = matches[current];
-      code.focus();
+      // 찾기/바꾸기 입력창이 포커스된 상태면 코드로 포커스 이동하지 않음
+      // forceFocus=true 일 때만 (버튼 클릭·Enter 이동 시) 코드로 이동
+      const findFocused = document.activeElement === findInput || document.activeElement === replaceInput;
+      if(!findFocused || forceFocus){ code.focus(); }
       code.setSelectionRange(m.start, m.end);
       // 선택 위치가 보이도록 스크롤
       const before = code.value.slice(0, m.start);
@@ -900,8 +903,8 @@
       code.scrollTop = Math.max(0, target);
       updateCount();
     }
-    function next(){ if(matches.length) select(current+1); }
-    function prev(){ if(matches.length) select(current-1); }
+    function next(){ if(matches.length) select(current+1, true); }
+    function prev(){ if(matches.length) select(current-1, true); }
 
     function open(withReplace){
       panel.hidden = false;
